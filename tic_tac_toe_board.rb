@@ -150,49 +150,46 @@ class TicTacToeBoard
       # pieces, and the second player at least 2.
       if pieces_count >= @size * 2 - 1
         # Check for wins.  First, check rows.
+        @flags[:win_positions] = []
         0.upto(@size-1) do |y|
           row_vals = 0.upto(@size-1).map { |x| @board[x][y] }
           if row_vals.first && row_vals.all? { |v| v == row_vals.first }
             @flags[:winner] = row_vals.first
             @flags[:win_type] = :row
             @flags[:win_desc] = y
-            @flags[:win_positions] = 0.upto(@size-1).map { |x| [x,y] }
+            @flags[:win_positions] += 0.upto(@size-1).map { |x| [x,y] }
             break
           end
         end
-        unless @flags[:winner]
-          # No winner yet, check columns
-          0.upto(@size-1) do |x|
-            col_vals = @board[x]
-            if col_vals.first && col_vals.all? { |v| v == col_vals.first }
-              @flags[:winner] = col_vals.first
-              @flags[:win_type] = :col
-              @flags[:win_desc] = x
-              @flags[:win_positions] = 0.upto(@size-1).map { |y| [x,y] }
-              break
-            end
+        # Check columns
+        0.upto(@size-1) do |x|
+          col_vals = @board[x]
+          if col_vals.first && col_vals.all? { |v| v == col_vals.first }
+            @flags[:winner] = col_vals.first
+            @flags[:win_type] = :col
+            @flags[:win_desc] = x
+            @flags[:win_positions] += 0.upto(@size-1).map { |y| [x,y] }
+            break
           end
         end
-        unless @flags[:winner]
-          # No winner yet, try diagonals, NW -> SE
-          diag_vals_nw_se = 0.upto(@size-1).map { |xy| @board[xy][xy] }
-          if diag_vals_nw_se.first && diag_vals_nw_se.all? { |v| v == diag_vals_nw_se.first }
-            @flags[:winner] = diag_vals_nw_se.first
-            @flags[:win_type] = :diagonal
-            @flags[:win_desc] = :nw_se
-            @flags[:win_positions] = 0.upto(@size-1).map { |xy| [xy,xy] }
-          end
+        # Try diagonals, NW -> SE
+        diag_vals_nw_se = 0.upto(@size-1).map { |xy| @board[xy][xy] }
+        if diag_vals_nw_se.first && diag_vals_nw_se.all? { |v| v == diag_vals_nw_se.first }
+          @flags[:winner] = diag_vals_nw_se.first
+          @flags[:win_type] = :diagonal
+          @flags[:win_desc] = :nw_se
+          @flags[:win_positions] += 0.upto(@size-1).map { |xy| [xy,xy] }
         end
-        unless @flags[:winner]
-          # No winner yet, try diagonals, SW -> NE
-          diag_vals_sw_ne = 0.upto(@size-1).map { |x| @board[x][@size - x - 1] }
-          if diag_vals_sw_ne.first && diag_vals_sw_ne.all? { |v| v == diag_vals_sw_ne.first }
-            @flags[:winner] = diag_vals_sw_ne.first
-            @flags[:win_type] = :diagonal
-            @flags[:win_desc] = :sw_ne
-            @flags[:win_positions] = 0.upto(@size-1).map { |x| [x,@size - x - 1] }
-          end
+        # Try diagonals, SW -> NE
+        diag_vals_sw_ne = 0.upto(@size-1).map { |x| @board[x][@size - x - 1] }
+        if diag_vals_sw_ne.first && diag_vals_sw_ne.all? { |v| v == diag_vals_sw_ne.first }
+          @flags[:winner] = diag_vals_sw_ne.first
+          @flags[:win_type] = :diagonal
+          @flags[:win_desc] = :sw_ne
+          @flags[:win_positions] += 0.upto(@size-1).map { |x| [x,@size - x - 1] }
         end
+        # Get rid of duplicates
+        @flags[:win_positions] = @flags[:win_positions].uniq
       end
       # It's a stalemate if the board is full without a winner
       if @flags[:full] && !@flags[:winner]
