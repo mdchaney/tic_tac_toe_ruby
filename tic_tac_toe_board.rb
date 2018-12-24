@@ -92,6 +92,7 @@ class TicTacToeBoard
   end
 
   def ==(other_tic_tac_toe_board)
+    @size == other_tic_tac_toe_board.size && @board == other_tic_tac_toe_board.board
   end
 
   protected
