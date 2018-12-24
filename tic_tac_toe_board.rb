@@ -9,9 +9,7 @@ class TicTacToeBoard
       @size = params[:size].to_i
       raise "Invalid size" if @size < 3 || @size > 5
       @board = @size.times.map { Array.new(@size) }
-      # This makes no sense, but the board is empty so the next player is
-      # 0.  That means the current_player is 1.
-      @current_player = 1
+      @current_player = nil
 
     elsif params[:board]
       # Initialize from another TicTacToeBoard
@@ -31,7 +29,7 @@ class TicTacToeBoard
         end
       end
       if moves == [0, 0]
-        @current_player = 1
+        @current_player = nil
       elsif moves.first > moves.last
         # This is counter-intuitive, but in this case player 0 just moved
         # and player 1 is up next.
@@ -55,8 +53,9 @@ class TicTacToeBoard
     set_flags
   end
 
+  # Determine who the next player will be
   def next_player
-    1 - @current_player
+    @current_player ? (1 - @current_player) : 0
   end
 
   def display(compact=false)
