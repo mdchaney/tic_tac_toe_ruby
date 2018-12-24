@@ -102,6 +102,20 @@ class TicTacToeBoard
     puts hsep
   end
 
+  # Display the entire game
+  def display_entire_game(compact=false)
+    if @parent
+      @parent.display_entire_game(compact)
+      puts unless compact
+    end
+    if @turn == 0
+      puts "Start"
+    else
+      puts "Turn #{@turn}"
+    end
+    display(compact)
+  end
+
   def ==(other_tic_tac_toe_board)
     @size == other_tic_tac_toe_board.size && @board == other_tic_tac_toe_board.board
   end
