@@ -63,6 +63,11 @@ class TicTacToeBoard
     @current_player ? (1 - @current_player) : 0
   end
 
+  # Do the next move, return a new TTTB
+  def apply_move(next_move)
+    self.class.new(board: self, move: next_move)
+  end
+
   def display(compact=false)
     low_int_on = "\e[2m"
     bold_on = "\e[1m"
