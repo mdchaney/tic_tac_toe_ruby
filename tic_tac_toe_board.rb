@@ -11,6 +11,7 @@ class TicTacToeBoard
       raise "Invalid size" if @size < 3 || @size > 5
       @board = @size.times.map { Array.new(@size) }
       @current_player = nil
+      @current_move = nil
       @turn = 0
 
     elsif params[:board]
