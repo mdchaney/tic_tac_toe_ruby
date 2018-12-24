@@ -1,5 +1,5 @@
 class TicTacToeBoard
-  attr_reader :size, :board, :current_player, :flags, :parent
+  attr_reader :size, :board, :current_player, :game_over, :flags, :parent
 
   PIECES=['X', 'O']
 
@@ -13,6 +13,7 @@ class TicTacToeBoard
 
     elsif params[:board]
       # Initialize from another TicTacToeBoard
+      raise StandardError, "Cannot continue finished game" if params[:board].game_over
       @size = params[:board].size
       @board = params[:board].board.map(&:dup)
       @current_player = params[:board].next_player
@@ -173,6 +174,9 @@ class TicTacToeBoard
         @flags[:stalemate] = true
       end
       @flags.freeze
+
+      # Set game_over, making it a pure boolean
+      @game_over = (@flags[:full] || @flags[:winner] != false)
     end
 
     # The position is 1 - 9, so a 3x3 board:
