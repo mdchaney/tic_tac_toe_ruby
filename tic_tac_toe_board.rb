@@ -68,6 +68,7 @@ class TicTacToeBoard
     self.class.new(board: self, move: next_move)
   end
 
+  # Display the board.  If passed "true", show a compact board.
   def display(compact=false)
     low_int_on = "\e[2m"
     bold_on = "\e[1m"
