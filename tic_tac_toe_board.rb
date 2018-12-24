@@ -1,6 +1,6 @@
 class TicTacToeBoard
   attr_reader :size, :board, :current_player, :current_move,
-              :game_over, :flags, :parent
+              :turn, :game_over, :flags, :parent
 
   PIECES=['X', 'O']
 
@@ -11,6 +11,7 @@ class TicTacToeBoard
       raise "Invalid size" if @size < 3 || @size > 5
       @board = @size.times.map { Array.new(@size) }
       @current_player = nil
+      @turn = 0
 
     elsif params[:board]
       # Initialize from another TicTacToeBoard
@@ -18,6 +19,7 @@ class TicTacToeBoard
       @size = params[:board].size
       @board = params[:board].board.map(&:dup)
       @current_player = params[:board].next_player
+      @turn = params[:board].turn + 1
       @parent = params[:board]
 
     elsif params[:array]
@@ -30,15 +32,14 @@ class TicTacToeBoard
           moves[@board[x][y]] += 1 if @board[x][y]
         end
       end
-      if moves == [0, 0]
+      @turn = moves.first + moves.last
+      if @turn == 0
         @current_player = nil
-      elsif moves.first > moves.last
-        # This is counter-intuitive, but in this case player 0 just moved
-        # and player 1 is up next.
-        @current_player = 0
       else
-        @current_player = 1
+        @current_player = (@turn.odd? ? 0 : 1)
       end
+      # No way to know which move was the last one
+      @current_move = nil
     end
 
     if params[:move]
