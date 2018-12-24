@@ -16,11 +16,11 @@ class TicTacToeBoard
     elsif params[:board]
       # Initialize from another TicTacToeBoard
       raise StandardError, "Cannot continue finished game" if params[:board].game_over
-      @size = params[:board].size
-      @board = params[:board].board.map(&:dup)
-      @current_player = params[:board].next_player
-      @turn = params[:board].turn + 1
       @parent = params[:board]
+      @size = @parent.size
+      @board = @parent.board.map(&:dup)
+      @current_player = @parent.next_player
+      @turn = @parent.turn + 1
 
     elsif params[:array]
       # Initialize from an array
