@@ -1,5 +1,6 @@
 class TicTacToeBoard
-  attr_reader :size, :board, :current_player, :game_over, :flags, :parent
+  attr_reader :size, :board, :current_player, :current_move,
+              :game_over, :flags, :parent
 
   PIECES=['X', 'O']
 
@@ -44,12 +45,14 @@ class TicTacToeBoard
       x_y = position_to_x_y(params[:move])
       raise StandardError, "Position unavailable" if @board[x_y.first][x_y.last]
       @board[x_y.first][x_y.last] = @current_player
+      @current_move = x_y
     end
 
     # This is where it become immutable
     @board.map(&:freeze)
     @board.freeze
     @current_player.freeze
+    @current_move.freeze
 
     set_flags
   end
