@@ -151,9 +151,11 @@ class TTTBTest < Minitest::Test
   end
 
   def test_create_from_array_works_with_game_in_progress
-    tttb = TicTacToeBoard.new(array: [[nil,0,0],[1,1,nil],[nil,nil,nil]])
+    board = [[nil,0,0],[1,1,nil],[nil,nil,nil]]
+    tttb = TicTacToeBoard.new(array: board)
     assert_equal 4, tttb.turn
     assert_equal 1, tttb.current_player
     assert_equal nil, tttb.current_move
+    assert_equal board, tttb.board
   end
 end
