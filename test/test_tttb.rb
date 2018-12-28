@@ -117,4 +117,43 @@ class TTTBTest < Minitest::Test
     move_list.each { |move| tttb = tttb.apply_move(move) }
     assert_raises(StandardError) { tttb.apply_move(6) }
   end
+
+  def test_can_create_tttb_from_array
+    tttb = TicTacToeBoard.new(array: [[nil,nil,nil],[nil,nil,nil],[nil,nil,nil]])
+    assert tttb.is_a?(TicTacToeBoard)
+  end
+
+  def test_create_from_array_must_be_correct_size
+    assert_raises(StandardError) {
+      TicTacToeBoard.new(array: [[nil, nil], [nil, nil]])
+    }
+  end
+
+  def test_create_from_array_must_have_valid_values
+    assert_raises(StandardError) {
+      TicTacToeBoard.new(array: [[nil,nil,nil],[nil,2,nil],[nil,nil,nil]])
+    }
+  end
+
+  def test_create_from_array_must_be_square
+    assert_raises(StandardError) {
+      TicTacToeBoard.new(array: [[nil,nil],[nil,0,nil],[nil,nil,nil]])
+    }
+  end
+
+  def test_create_from_array_must_have_balanced_moves
+    assert_raises(StandardError) {
+      TicTacToeBoard.new(array: [[nil,1,1],[nil,0,nil],[nil,nil,nil]])
+    }
+    assert_raises(StandardError) {
+      TicTacToeBoard.new(array: [[nil,0,0],[0,1,nil],[nil,nil,nil]])
+    }
+  end
+
+  def test_create_from_array_works_with_game_in_progress
+    tttb = TicTacToeBoard.new(array: [[nil,0,0],[1,1,nil],[nil,nil,nil]])
+    assert_equal 4, tttb.turn
+    assert_equal 1, tttb.current_player
+    assert_equal nil, tttb.current_move
+  end
 end

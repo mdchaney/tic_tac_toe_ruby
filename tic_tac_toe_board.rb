@@ -36,14 +36,20 @@ class TicTacToeBoard
     elsif params[:array]
       # Initialize from an array
       @size = params[:array].size
+      # Ensure that the size is 3, 4, or 5
+      raise "Invalid size" if @size < 3 || @size > 5
+      # Ensure that the board has only valid values
+      values = params[:array].flatten
+      raise StandardError, "Board must contain only nil, 0, or 1 in all positions" unless values.all? { |v| [nil,0,1].include?(v) }
+      # Ensure that board is properly dimensioned
+      raise StandardError, "Board is not square" unless params[:array].all? { |col| col.count == params[:array].count }
+      # Ensure that the player's moves are balanced
       @board = params[:array].map(&:dup)
       moves = [0, 0]
-      0.upto(@size-1) do |y|
-        0.upto(@size-1) do |x|
-          moves[@board[x][y]] += 1 if @board[x][y]
-        end
-      end
-      @turn = moves.first + moves.last
+      moves[0] = values.select { |v| v == 0 }.count
+      moves[1] = values.select { |v| v == 1 }.count
+      raise StandardError, "Moves are not balanced" unless moves[0] == moves[1] || moves[0] == moves[1] + 1
+      @turn = moves[0] + moves[1]
       if @turn == 0
         @current_player = nil
       else
