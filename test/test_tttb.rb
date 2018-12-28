@@ -155,7 +155,7 @@ class TTTBTest < Minitest::Test
     tttb = TicTacToeBoard.new(array: board)
     assert_equal 4, tttb.turn
     assert_equal 1, tttb.current_player
-    assert_equal nil, tttb.current_move
+    assert_nil tttb.current_move
     assert_equal board, tttb.board
   end
 
