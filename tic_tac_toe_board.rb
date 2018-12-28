@@ -66,7 +66,7 @@ class TicTacToeBoard
       @current_move = x_y
     end
 
-    # This is where it become immutable
+    # This is where it becomes immutable
     @board.map(&:freeze)
     @board.freeze
     @current_player.freeze
