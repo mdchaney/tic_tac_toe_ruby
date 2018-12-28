@@ -158,4 +158,10 @@ class TTTBTest < Minitest::Test
     assert_equal nil, tttb.current_move
     assert_equal board, tttb.board
   end
+
+  def test_move_is_applied_properly
+    tttb = TicTacToeBoard.new(size: 3)
+    tttb = tttb.apply_move(5)
+    assert_equal 0, tttb.board[1][1]
+  end
 end

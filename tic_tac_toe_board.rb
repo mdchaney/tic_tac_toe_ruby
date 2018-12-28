@@ -33,6 +33,13 @@ class TicTacToeBoard
       @current_player = @parent.next_player
       @turn = @parent.turn + 1
 
+      if params[:move]
+        x_y = position_to_x_y(params[:move])
+        raise StandardError, "Position unavailable" if @board[x_y.first][x_y.last]
+        @board[x_y.first][x_y.last] = @current_player
+        @current_move = x_y
+      end
+
     elsif params[:array]
       # Initialize from an array
       @size = params[:array].size
@@ -57,13 +64,6 @@ class TicTacToeBoard
       end
       # No way to know which move was the last one
       @current_move = nil
-    end
-
-    if params[:move]
-      x_y = position_to_x_y(params[:move])
-      raise StandardError, "Position unavailable" if @board[x_y.first][x_y.last]
-      @board[x_y.first][x_y.last] = @current_player
-      @current_move = x_y
     end
 
     # This is where it becomes immutable
