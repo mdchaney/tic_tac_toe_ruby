@@ -4,6 +4,16 @@ class TicTacToeBoard
 
   PIECES=['X', 'O']
 
+  # There are three ways to initialize a TicTacToeBoard:
+  #
+  # Empty 3x3 board:
+  # tttb = TicTacToeBoard.new(size: 3)
+  #
+  # Existing board with a move applied:
+  # tttb = TicTacToeBoard.new(board: other_tttb, move: 5)
+  #
+  # New board based on an array:
+  # tttb = TicTacToeBoard.new(array: [[nil,nil,nil],[nil,nil,nil],[nil,nil,nil]])
   def initialize(params)
     if params[:size]
       # Initialize an empty board
