@@ -234,7 +234,7 @@ class TicTacToeBoard
         when 1
           return { winner_1: 1, win_level_1: 0 }
         else
-          return nil
+          return { winner_0: 0, winner_1: 0 }
         end
       end
     else
