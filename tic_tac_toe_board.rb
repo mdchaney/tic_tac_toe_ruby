@@ -240,13 +240,8 @@ class TicTacToeBoard
     else
       board = self
     end
-    moves = (1..(@size*@size)).to_a
-    moves.select! { |v| board.position_available(v) }
-    stats = []
-    while moves.count > 0
-      move = moves.sample
-      moves.reject! { |v| v == move }
-      stats[move] = board.get_stats(move)
+    stats = (1..(@size*@size)).select { |v| board.position_available(v) }.each_with_object([]) do |move, o|
+      o[move] = board.get_stats(move)
     end
     if next_move
       # Need to aggregate these 
