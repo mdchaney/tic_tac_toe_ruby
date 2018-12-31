@@ -137,6 +137,143 @@ class TicTacToeBoard
     @size == other_tic_tac_toe_board.size && @board == other_tic_tac_toe_board.board
   end
 
+  def position_available(move)
+    x_y = position_to_x_y(move)
+    @board[x_y.first][x_y.last].nil?
+  end
+
+  # Figure out a good move for the next player.  Returns a position #.
+  def next_suggested_move
+    # Short circuit - first move is random.  The middle space is
+    # actually best on a 3x3 or 5x5, but that makes it boring.
+    if @turn == 0
+      rand(@size * @size)
+    else
+      # Since we're past the first move, we need to actually play some
+      # games to see what's left.  In order of preferability:
+      #
+      # 1. Player wins every time
+      # 2. Better chance of winning or wins earlier than other player
+      # 3. Other player doesn't win
+      # 4. Argh! Probably going to lose, whatever
+      stats = get_stats
+      this_player = next_player
+      if this_player == 0
+        this_player_winner = :winner_0
+        other_player_winner = :winner_1
+        this_player_win_level = :win_level_0
+        other_player_win_level = :win_level_1
+      else
+        this_player_winner = :winner_1
+        other_player_winner = :winner_0
+        this_player_win_level = :win_level_1
+        other_player_win_level = :win_level_0
+      end
+      move = nil
+      # Look for a sure win
+      #puts "stats:"
+      #pp stats
+      stats.each_index do |x|
+        if stats[x]
+          if stats[x][this_player_win_level] && !stats[x][other_player_win_level]
+            #puts "Sure winner: #{x}"
+            return x
+          end
+        end
+      end
+      # At least have a better chance of winning
+      best_so_far = nil
+      stats.each_index do |x|
+        if stats[x] && stats[x][this_player_win_level] && stats[x][other_player_win_level]
+          if stats[x][this_player_winner] > stats[x][other_player_winner] || stats[x][this_player_win_level] < stats[x][other_player_win_level]
+            if best_so_far
+              if stats[x][this_player_winner] > stats[best_so_far][this_player_winner] || stats[x][this_player_win_level] < stats[x][other_player_win_level]
+                best_so_far = x
+              end
+            else
+              best_so_far = x
+            end
+          end
+        end
+      end
+      if best_so_far
+        #puts "Better chance: #{best_so_far}"
+        return best_so_far
+      end
+      # Find one where other player doesn't win
+      stats.each_index do |x|
+        if stats[x]
+          unless stats[x][other_player_win_level]
+            #puts "Other player doesn't win: #{x}"
+            return x
+          end
+        end
+      end
+      # Just get the first move
+      stats.each_index do |x|
+        if stats[x]
+          #puts "Giving up: #{x}"
+          return x
+        end
+      end
+    end
+  end
+
+  # Recursively get stats.  This returns an array with the stats for
+  # each possible position, including number of wins by both players
+  # and how soon each player can win.  Stats are aggregated at each level
+  # as they bubble up.
+  def get_stats(next_move=nil)
+    if next_move
+      board = apply_move(next_move)
+      # If this game is finished, return the stats
+      if board.game_over
+        case board.flags[:winner]
+        when 0
+          return { winner_0: 1, win_level_0: 0 }
+        when 1
+          return { winner_1: 1, win_level_1: 0 }
+        else
+          return nil
+        end
+      end
+    else
+      board = self
+    end
+    moves = (1..(@size*@size)).to_a
+    moves.select! { |v| board.position_available(v) }
+    stats = []
+    while moves.count > 0
+      move = moves.sample
+      moves.reject! { |v| v == move }
+      stats[move] = board.get_stats(move)
+    end
+    if next_move
+      # Need to aggregate these 
+      aggr = { winner_0: 0, winner_1: 0, win_level_0: nil, win_level_1: nil }
+      stats.reject(&:nil?).each do |s|
+        # Sum the number of wins for each player
+        aggr[:winner_0] += s[:winner_0] if s[:winner_0]
+        aggr[:winner_1] += s[:winner_1] if s[:winner_1]
+        # Determine the shallowest win level for each player
+        if s[:win_level_0]
+          if aggr[:win_level_0].nil? || s[:win_level_0] + 1 < aggr[:win_level_0]
+            aggr[:win_level_0] = s[:win_level_0] + 1
+          end
+        end
+        if s[:win_level_1]
+          if aggr[:win_level_1].nil? || s[:win_level_1] + 1 < aggr[:win_level_1]
+            aggr[:win_level_1] = s[:win_level_1] + 1
+          end
+        end
+      end
+      aggr
+    else
+      # This is the initial call, so just return the stats array
+      stats
+    end
+  end
+
   protected
 
     # The flags are as follows:
