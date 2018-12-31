@@ -171,48 +171,63 @@ class TicTacToeBoard
       end
       move = nil
       # Look for a sure win
-      #puts "stats:"
-      #pp stats
-      stats.each_index do |x|
-        if stats[x]
-          if stats[x][this_player_win_level] && !stats[x][other_player_win_level]
-            #puts "Sure winner: #{x}"
-            return x
+      puts "stats:"
+      pp stats
+      moves = (1..(@size*@size)).to_a
+      while moves.count > 0
+        move = moves.sample
+        moves.reject! { |v| v == move }
+        if stats[move]
+          if stats[move][this_player_win_level] && !stats[move][other_player_win_level]
+            puts "Sure winner: #{move}"
+            return move
           end
         end
       end
-      # At least have a better chance of winning
-      best_so_far = nil
-      stats.each_index do |x|
-        if stats[x] && stats[x][this_player_win_level] && stats[x][other_player_win_level]
-          if stats[x][this_player_winner] > stats[x][other_player_winner] || stats[x][this_player_win_level] < stats[x][other_player_win_level]
-            if best_so_far
-              if stats[x][this_player_winner] > stats[best_so_far][this_player_winner] || stats[x][this_player_win_level] < stats[x][other_player_win_level]
-                best_so_far = x
-              end
-            else
-              best_so_far = x
-            end
-          end
+      # At least have a better chance of winning.  This only considers
+      # moves that result in a win for this player.  It computes a weight
+      # for each potentially winning move, then chooses one of the moves
+      # with the highest weight.
+      weights = Hash.new
+      moves = (1..(@size*@size)).to_a
+      while moves.count > 0
+        move = moves.sample
+        moves.reject! { |v| v == move }
+        if stats[move] && stats[move][this_player_winner] > 0
+          weights[move] = 0
+          # Higher score based on this player wins vs. other player wins
+          weights[move] += (stats[move][this_player_winner] - stats[move][other_player_winner]) * 5
+          # Higher score for winning sooner
+          weights[move] += (stats[move][this_player_win_level] - stats[move][other_player_win_level])
         end
       end
-      if best_so_far
-        #puts "Better chance: #{best_so_far}"
-        return best_so_far
+      if weights.count > 0
+        puts "Weights:"
+        pp weights
+        # Sort by weights, highest first.  This also collapses the hash to
+        # an array, where each item is an array of [move,weight]
+        weights = weights.to_a.sort_by(&:last).reverse
+        # Pick out all items with the highest weight
+        weights = weights.select { |w| w.last == weights.first.last }
+        # Return a random one
+        return weights.sample.first
       end
       # Find one where other player doesn't win
-      stats.each_index do |x|
-        if stats[x]
-          unless stats[x][other_player_win_level]
-            #puts "Other player doesn't win: #{x}"
-            return x
+      moves = (1..(@size*@size)).to_a
+      while moves.count > 0
+        move = moves.sample
+        moves.reject! { |v| v == move }
+        if stats[move]
+          unless stats[move][other_player_win_level]
+            puts "Other player doesn't win: #{move}"
+            return move
           end
         end
       end
       # Just get the first move
       stats.each_index do |x|
         if stats[x]
-          #puts "Giving up: #{x}"
+          puts "Giving up: #{x}"
           return x
         end
       end
